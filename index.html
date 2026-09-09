@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>KIMCHI-RUN</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="game" width="320" height="180"></canvas>
+
+  <!-- ── 로딩 ───────────────────────────── -->
+  <div class="panel" id="scr-loading">
+    <div class="load-bar"><i id="load-fill"></i></div>
+    <p class="load-txt">불러오는 중…</p>
+  </div>
+
+  <!-- ── 타이틀 ─────────────────────────── -->
+  <div class="panel" id="scr-title" hidden>
+    <img class="pix logo" id="logo" alt="KIMCHI-RUN">
+    <div class="skins" id="skin-row" hidden>
+      <button class="skin-nav" id="skin-prev" aria-label="이전 캐릭터">◀</button>
+      <span class="skin-name" id="skin-name">김치맨</span>
+      <button class="skin-nav" id="skin-next" aria-label="다음 캐릭터">▶</button>
+    </div>
+    <img class="pix start blink" id="btn-start" alt="TAP TO START">
+    <p class="help">
+      <b>SPACE</b> / <b>탭</b> 점프 · 공중에서 한 번 더 <b>2단 점프</b><br>
+      <b>↓</b> / <b>아래쪽 탭</b> 슬라이드 · <b>P</b> 일시정지 · <b>M</b> 음악
+    </p>
+  </div>
+
+  <!-- ── 일시정지 ───────────────────────── -->
+  <div class="panel dim" id="scr-pause" hidden>
+    <h2>일시정지</h2>
+    <p class="help"><b>P</b> 또는 화면을 눌러 계속</p>
+  </div>
+
+  <!-- ── 게임오버 ───────────────────────── -->
+  <div class="panel dim" id="scr-over" hidden>
+    <h2 id="over-title">배추를 놓쳤다!</h2>
+    <dl class="stats">
+      <div><dt>점수</dt><dd id="st-score">0</dd></div>
+      <div><dt>거리</dt><dd id="st-dist">0 m</dd></div>
+      <div><dt>최고 콤보</dt><dd id="st-combo">0</dd></div>
+      <div><dt>수확</dt><dd id="st-items">0</dd></div>
+    </dl>
+    <p class="best" id="st-best">최고 기록 0</p>
+    <img class="pix start blink" id="btn-retry" alt="TAP TO START">
+    <p class="help"><b>R</b> 다시 시작</p>
+  </div>
+
+  <!-- ── 모바일 터치 존 ─────────────────── -->
+  <div id="touch" hidden>
+    <div class="tz tz-jump" id="tz-jump"><span>JUMP</span></div>
+    <div class="tz tz-slide" id="tz-slide"><span>SLIDE</span></div>
+  </div>
+</div>
+
+<script src="src/config.js"></script>
+<script src="src/font.js"></script>
+<script src="src/assets.js"></script>
+<script src="src/audio.js"></script>
+<script src="src/input.js"></script>
+<script src="src/background.js"></script>
+<script src="src/player.js"></script>
+<script src="src/entities.js"></script>
+<script src="src/hud.js"></script>
+<script src="src/game.js"></script>
+</body>
+</html>

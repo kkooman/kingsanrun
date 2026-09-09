@@ -6,7 +6,7 @@
 
 /* 에셋을 고치고 새로고침해도 브라우저 캐시에 걸리지 않게 올려 주는 값.
    file:// 로 열 때는 쿼리를 붙이지 않는다. */
-const ASSET_VERSION = 3;
+const ASSET_VERSION = 5;
 
 const VIEW_W = 320;
 const VIEW_H = 180;
@@ -32,7 +32,10 @@ const SPIN_FRAMES = 22;           // 2단 점프 회전 길이
 
 /* ── 슬라이드 ─────────────────────────────── */
 const SLIDE_MIN   = 16;           // 최소 유지 프레임
-const SLIDE_MAX   = 60;           // 최대 유지 프레임(자동 해제)
+/* 최대 유지 프레임(자동 해제). 버튼을 계속 누르는 모바일에서 갑자기
+   일어서면 고장처럼 느껴지므로 넉넉하게 둔다. 슬라이드 중에도 할머니·
+   스쿠터와는 그대로 부딪히니 무한 슬라이드가 이득이 되지는 않는다. */
+const SLIDE_MAX   = 150;
 
 /* ── 판정 박스 (셀 좌표 기준) ─────────────── */
 const HB_RUN   = { x: 10, y:  5, w: 12, h: 27 };   // 32x32 셀 안에서
@@ -95,6 +98,33 @@ const SKINS = [
     runFeet: 31,                                // run 셀 안에서 발바닥 y
     jumpFeet: [62, 44, 53, 63, 63, 63],         // jump 프레임별 발바닥 y
     slideFrame: 4,                              // 슬라이드에 쓸 jump 프레임
+  },
+  {
+    id: 'hosanna',
+    name: '호산나',
+    run: 'hosanna_run',
+    jump: 'hosanna_jump',
+    runFeet: 31,
+    jumpFeet: [62, 44, 53, 63, 63, 63],
+    slideFrame: 4,
+  },
+  {
+    id: 'goguma',
+    name: '고구마',
+    run: 'goguma_run',
+    jump: 'goguma_jump',
+    runFeet: 31,
+    jumpFeet: [62, 44, 53, 63, 63, 63],
+    slideFrame: 4,
+  },
+  {
+    id: 'cookie',
+    name: '용감한쿠키',
+    run: 'cookie_run',
+    jump: 'cookie_jump',
+    runFeet: 31,
+    jumpFeet: [62, 44, 53, 63, 63, 63],
+    slideFrame: 4,
   },
   {
     id: 'kimchi',

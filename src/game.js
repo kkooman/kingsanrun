@@ -18,6 +18,8 @@
     over: $('scr-over'), overTitle: $('over-title'), retry: $('btn-retry'),
     stScore: $('st-score'), stDist: $('st-dist'), stCombo: $('st-combo'),
     stItems: $('st-items'), stBest: $('st-best'),
+    pad: $('pad'), tools: $('tools'),
+    btnPause: $('btn-pause'), btnMusic: $('btn-music'), btnFull: $('btn-full'),
   };
 
   const ctx = el.canvas.getContext('2d', { alpha: false });
@@ -48,12 +50,32 @@
     set(v) { try { localStorage.setItem('kingsan.best', String(v)); } catch (e) {} },
   };
 
-  /* ── 화면 배율 ─────────────────────────── */
+  /* ── 화면 배율 / 조작 패드 배치 ──────────
+     세로 화면처럼 아래에 여유가 있으면 패드를 무대 밖에 붙이고(docked),
+     가로 화면처럼 화면이 꽉 차면 무대 위에 반투명으로 겹친다(overlay). */
+  const PAD_DOCK_MIN = 84;      // 도킹에 필요한 최소 여유 높이(px)
+  const PAD_DOCK_MAX = 210;
+
   function resize() {
-    const pad = innerWidth < 480 ? 0 : 16;
-    let s = Math.min((innerWidth - pad) / VIEW_W, (innerHeight - pad) / VIEW_H);
-    s = s >= 1 ? Math.floor(s) : Math.max(0.4, s);
+    const touch = Input.isTouch();
+    const margin = (!touch && innerWidth >= 480) ? 16 : 0;
+    let s = Math.min((innerWidth - margin) / VIEW_W, (innerHeight - margin) / VIEW_H);
+    /* 데스크톱은 정수 배율로 선명하게, 모바일은 화면을 꽉 채우는 쪽을 택한다 */
+    if (!touch && s >= 1) s = Math.floor(s);
+    s = Math.max(0.4, s);
+
+    let docked = false;
+    if (touch) {
+      const leftover = innerHeight - VIEW_H * s;
+      docked = leftover >= PAD_DOCK_MIN;
+      if (docked) {
+        const h = Math.min(leftover - 4, PAD_DOCK_MAX);
+        document.documentElement.style.setProperty('--pad-h', h + 'px');
+      }
+    }
     document.documentElement.style.setProperty('--s', String(s));
+    document.body.classList.toggle('docked', docked);
+    document.body.classList.toggle('overlay', touch && !docked);
   }
   addEventListener('resize', resize);
   addEventListener('orientationchange', () => setTimeout(resize, 120));
@@ -76,6 +98,7 @@
   function show(state) {
     g.state = state;
     g.playing = state === S.PLAYING;
+    if (el.btnPause) el.btnPause.textContent = state === S.PAUSED ? '▶' : '❚❚';
     el.loading.hidden = state !== S.LOADING;
     el.title.hidden   = state !== S.TITLE;
     el.pause.hidden   = state !== S.PAUSED;
@@ -142,6 +165,33 @@
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && g.state === S.PLAYING) show(S.PAUSED);
   });
+
+  /* ── 상단 도구 버튼 (일시정지 / 음악 / 전체화면) ── */
+  function tool(btn, fn) {
+    if (!btn) return;
+    btn.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); fn(); });
+    btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
+  }
+  tool(el.btnPause, () => {
+    Sfx.init(); Sfx.ui();
+    if (g.state === S.PLAYING) show(S.PAUSED);
+    else if (g.state === S.PAUSED) show(S.PLAYING);
+  });
+  tool(el.btnMusic, () => {
+    Sfx.init();
+    const on = Sfx.toggleMusic();
+    Sfx.startMusic();
+    el.btnMusic.classList.toggle('off', !on);
+  });
+
+  const canFullscreen = !!document.documentElement.requestFullscreen;
+  if (!canFullscreen) el.btnFull.hidden = true;
+  tool(el.btnFull, () => {
+    Sfx.ui();
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+  });
+  addEventListener('fullscreenchange', () => setTimeout(resize, 80));
 
   /* ── 한 프레임 시뮬레이션 ──────────────── */
   function step() {
@@ -314,6 +364,8 @@
       applySkin();
 
       el.stBest.textContent = '최고 기록 ' + best.get().toLocaleString('ko-KR');
+      el.btnMusic.classList.toggle('off', !Sfx.isMusicOn());
+      resize();
       toTitle();
       requestAnimationFrame(frame);
     });

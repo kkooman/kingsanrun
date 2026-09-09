@@ -7,7 +7,8 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="stage">
+<div id="app">
+  <div id="stage">
   <canvas id="game" width="320" height="180"></canvas>
 
   <!-- ── 로딩 ───────────────────────────── -->
@@ -25,16 +26,21 @@
       <button class="skin-nav" id="skin-next" aria-label="다음 캐릭터">▶</button>
     </div>
     <img class="pix start blink" id="btn-start" alt="TAP TO START">
-    <p class="help">
-      <b>SPACE</b> / <b>탭</b> 점프 · 공중에서 한 번 더 <b>2단 점프</b><br>
-      <b>↓</b> / <b>아래쪽 탭</b> 슬라이드 · <b>P</b> 일시정지 · <b>M</b> 음악
+    <p class="help kb">
+      <b>SPACE</b> 점프 · 공중에서 한 번 더 <b>2단 점프</b><br>
+      <b>↓</b> 슬라이드 · <b>P</b> 일시정지 · <b>M</b> 음악
+    </p>
+    <p class="help tch">
+      아래 <b>점프</b> 버튼 · 공중에서 한 번 더 눌러 <b>2단 점프</b><br>
+      <b>슬라이드</b> 버튼은 누르고 있는 동안 유지
     </p>
   </div>
 
   <!-- ── 일시정지 ───────────────────────── -->
   <div class="panel dim" id="scr-pause" hidden>
     <h2>일시정지</h2>
-    <p class="help"><b>P</b> 또는 화면을 눌러 계속</p>
+    <p class="help kb"><b>P</b> 또는 화면을 눌러 계속</p>
+    <p class="help tch">화면을 눌러 계속</p>
   </div>
 
   <!-- ── 게임오버 ───────────────────────── -->
@@ -48,15 +54,31 @@
     </div>
     <p class="best" id="st-best">최고 기록 0</p>
     <img class="pix start blink" id="btn-retry" alt="TAP TO START">
-    <p class="help"><b>R</b> 다시 시작</p>
+    <p class="help kb"><b>R</b> 다시 시작</p>
   </div>
 
-  <!-- ── 모바일 터치 존 ─────────────────── -->
-  <div id="touch" hidden>
-    <div class="tz tz-jump" id="tz-jump"><span>JUMP</span></div>
-    <div class="tz tz-slide" id="tz-slide"><span>SLIDE</span></div>
+  </div><!-- /stage -->
+
+  <!-- ── 도구 버튼 (일시정지 / 음악 / 전체화면) ── -->
+  <div id="tools" hidden>
+    <button class="tool" id="btn-pause" type="button" aria-label="일시정지">❚❚</button>
+    <button class="tool" id="btn-music" type="button" aria-label="음악 켜기/끄기">♪</button>
+    <button class="tool" id="btn-full"  type="button" aria-label="전체화면">⛶</button>
   </div>
-</div>
+
+  <!-- 세로 화면 안내 (가로 화면에서는 감춤) -->
+  <p id="rotate-hint" hidden>화면을 가로로 돌리면 더 크게 즐길 수 있어요</p>
+
+  <!-- ── 모바일 조작 패드 ───────────────── -->
+  <div id="pad" hidden>
+    <button class="pad-btn slide" id="btn-slide" type="button" aria-label="슬라이드">
+      <span class="ico">▼</span><span class="lbl">슬라이드</span>
+    </button>
+    <button class="pad-btn jump" id="btn-jump" type="button" aria-label="점프">
+      <span class="ico">▲</span><span class="lbl">점프</span>
+    </button>
+  </div>
+</div><!-- /app -->
 
 <script src="src/config.js"></script>
 <script src="src/font.js"></script>

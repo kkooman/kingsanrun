@@ -4,7 +4,7 @@
     {
       "name": "kingsan-run",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "5177"],
+      "runtimeArgs": ["tools/serve.py", "5177"],
       "port": 5177
     }
   ]

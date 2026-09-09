@@ -11,10 +11,14 @@
 
 html, body {
   height: 100%;
+  /* 모바일 브라우저 툴바가 접히고 펴져도 높이가 흔들리지 않게 */
+  height: 100dvh;
   background: #0d1120;
   color: var(--cream);
   font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
   overflow: hidden;
+  overscroll-behavior: none;          /* 당겨서 새로고침 방지 */
+  touch-action: none;                 /* 스크롤·핀치줌 방지 */
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
@@ -27,8 +31,18 @@ body {
     radial-gradient(120% 90% at 50% 0%, #24304f 0%, #0d1120 70%);
 }
 
+#app {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
 #stage {
   position: relative;
+  flex: none;
   width: calc(320px * var(--s));
   height: calc(180px * var(--s));
   outline: calc(0.5px * var(--s)) solid #000;
@@ -94,6 +108,10 @@ canvas {
   color: #cfd6ea;
   text-shadow: 0 calc(1px * var(--s)) 0 rgba(0, 0, 0, .8);
 }
+.help.tch { display: none; }
+body.touch .help.kb { display: none; }
+body.touch .help.tch { display: block; }
+
 .help b {
   display: inline-block;
   padding: 0 calc(1.5px * var(--s));
@@ -159,6 +177,7 @@ canvas {
   cursor: pointer;
 }
 .skin-nav:active { background: #4a5680; }
+body.touch .skin-nav { padding: calc(3px * var(--s)) calc(5px * var(--s)); font-size: calc(7px * var(--s)); }
 .skin-name {
   min-width: calc(56px * var(--s));
   padding: calc(1.5px * var(--s)) calc(3px * var(--s));
@@ -169,16 +188,143 @@ canvas {
   border: calc(0.5px * var(--s)) solid #4a5680;
 }
 
-/* ── 터치 존 ──────────────────────────────── */
-#touch { position: absolute; inset: 0; }
-#touch[hidden] { display: none; }
-.tz { position: absolute; left: 0; right: 0; display: grid; place-items: end center; }
-.tz-jump  { top: 0; height: 64%; }
-.tz-slide { bottom: 0; height: 36%; background: rgba(255, 255, 255, .05); place-items: center; }
-.tz span {
-  font-size: calc(5px * var(--s));
-  letter-spacing: calc(0.5px * var(--s));
-  color: rgba(255, 255, 255, .34);
-  padding: calc(3px * var(--s));
+/* ── 모바일 조작 패드 ─────────────────────── */
+#pad[hidden], #tools[hidden] { display: none; }
+
+#pad {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4vw;
+  width: calc(320px * var(--s));
+  max-width: 100%;
+  touch-action: none;
 }
-.tz:active { background: rgba(255, 255, 255, .12); }
+
+.pad-btn {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font: inherit;
+  color: #fff;
+  border: 2px solid #5a6798;
+  background: linear-gradient(#3c4670, #262d4c);
+  box-shadow: 0 3px 0 #171c30;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.pad-btn .ico { font-size: 1.6em; line-height: 1; }
+.pad-btn .lbl { font-size: .78em; letter-spacing: .04em; color: #cfd6ea; }
+.pad-btn.jump  { border-color: #7aa93f; background: linear-gradient(#7cc23f, #4e8f24); box-shadow: 0 3px 0 #2c5412; }
+.pad-btn.jump .lbl { color: #eaf6dc; }
+.pad-btn.slide { border-color: #7d6aa8; background: linear-gradient(#6f5fa0, #443a68); box-shadow: 0 3px 0 #241d3a; }
+
+.pad-btn.on {
+  transform: translateY(3px);
+  box-shadow: none;
+  filter: brightness(1.28);
+}
+
+/* 세로 화면 — 게임은 위, 조작 버튼은 아래(엄지 닿는 곳)에 붙인다 */
+body.docked #app {
+  height: 100%;
+  justify-content: flex-start;
+}
+body.docked #pad {
+  order: 2;
+  height: var(--pad-h, 120px);
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  gap: 10px;
+  border-top: 1px solid #232b47;
+  background: linear-gradient(rgba(35, 43, 71, 0), rgba(35, 43, 71, .55));
+}
+body.docked .pad-btn {
+  height: 100%;
+  border-radius: 16px;
+  font-size: clamp(14px, 4.4vw, 24px);
+}
+
+/* 가로 화면 — 화면이 꽉 차므로 아래 양쪽에 반투명으로 겹친다 */
+body.overlay #pad {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  /* 화면 양쪽 아래 구석에만 놓아 플레이어와 다가오는 장애물을 가리지 않게 */
+  padding: 0 max(8px, env(safe-area-inset-left, 0px))
+           max(8px, env(safe-area-inset-bottom, 0px))
+           max(8px, env(safe-area-inset-right, 0px));
+  pointer-events: none;
+  gap: 0;
+}
+body.overlay .pad-btn {
+  flex: 0 0 auto;
+  width: clamp(62px, 13vw, 96px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: .5;
+  pointer-events: auto;
+}
+body.overlay .pad-btn.on { opacity: .95; }
+body.overlay .pad-btn .lbl { display: none; }
+body.overlay .pad-btn .ico { font-size: 2em; }
+
+/* ── 도구 버튼 (일시정지 / 음악 / 전체화면) ───── */
+.tool {
+  font: inherit;
+  line-height: 1;
+  color: #dfe5f5;
+  background: rgba(13, 17, 32, .66);
+  border: 1px solid rgba(122, 136, 184, .7);
+  cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.tool:active { background: rgba(90, 103, 152, .95); }
+.tool.off { color: #6f7793; }
+
+#tools { display: flex; z-index: 5; }
+
+/* 세로 화면 — 게임 아래 조작 영역 위쪽에 손가락 크기로 */
+body.docked #tools {
+  gap: 10px;
+  margin: auto 0;              /* 무대와 조작 버튼 사이 빈 공간에 가운데 정렬 */
+  order: 1;
+}
+body.docked .tool {
+  min-width: 46px;
+  padding: 11px 13px;
+  font-size: 16px;
+  border-radius: 9px;
+}
+
+/* 가로 화면 — 무대 위쪽 가운데에 작게 겹친다 */
+body.overlay #tools {
+  position: absolute;
+  top: calc(1px * var(--s));
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 6px;
+}
+body.overlay .tool {
+  min-width: 34px;
+  padding: 7px 9px;
+  font-size: 13px;
+  border-radius: 6px;
+  opacity: .8;
+}
+
+/* ── 세로 화면 안내 문구 ─────────────────────── */
+#rotate-hint[hidden] { display: none; }
+#rotate-hint {
+  order: 0;
+  margin: 16px 16px 0;
+  font-size: 12px;
+  color: #6f7793;
+  text-align: center;
+}
+body.overlay #rotate-hint { display: none; }

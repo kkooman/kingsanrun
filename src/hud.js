@@ -44,7 +44,7 @@ const Hud = (() => {
     }
 
     /* ── 시작 직후 안내 ── */
-    if (g.frame < 100) {
+    if (g.frame < 100 && g.playing) {
       const a = g.frame < 70 ? 1 : 1 - (g.frame - 70) / 30;
       ctx.globalAlpha = a;
       PixelFont.draw(ctx, 'GO!', VIEW_W / 2, 62,

@@ -6,11 +6,14 @@
 const Assets = (() => {
   const img = {};
   let total = 0, done = 0;
+  /* http(s) 로 서빙될 때만 캐시 버스터를 붙인다 (file:// 은 쿼리를 못 붙임) */
+  const BUST = /^https?:/.test(location.protocol) ? '?v=' + ASSET_VERSION : '';
 
   const REQUIRED = [
     'sky', 'buildings', 'ground',
     'building_01', 'building_02', 'building_03', 'building_04', 'building_05',
     'player_run', 'player_jump',
+    'kid_run', 'kid_jump',
     'halmoni', 'delivery',
     'baechu', 'garlic', 'gochu', 'goldbaechu',
     'heart_on', 'heart_off',
@@ -27,7 +30,7 @@ const Assets = (() => {
         if (optional) resolve(false);
         else { console.error('에셋 누락: assets/' + name + '.png'); resolve(false); }
       };
-      im.src = 'assets/' + name + '.png';
+      im.src = 'assets/' + name + '.png' + BUST;
     });
   }
 

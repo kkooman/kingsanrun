@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>KIMCHI-RUN</title>
+<title>KINGSAN-RUN</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
 
   <!-- ── 타이틀 ─────────────────────────── -->
   <div class="panel" id="scr-title" hidden>
-    <img class="pix logo" id="logo" alt="KIMCHI-RUN">
+    <img class="pix logo" id="logo" alt="KINGSAN-RUN">
     <div class="skins" id="skin-row" hidden>
       <button class="skin-nav" id="skin-prev" aria-label="이전 캐릭터">◀</button>
       <span class="skin-name" id="skin-name">김치맨</span>
@@ -40,12 +40,12 @@
   <!-- ── 게임오버 ───────────────────────── -->
   <div class="panel dim" id="scr-over" hidden>
     <h2 id="over-title">배추를 놓쳤다!</h2>
-    <dl class="stats">
-      <div><dt>점수</dt><dd id="st-score">0</dd></div>
-      <div><dt>거리</dt><dd id="st-dist">0 m</dd></div>
-      <div><dt>최고 콤보</dt><dd id="st-combo">0</dd></div>
-      <div><dt>수확</dt><dd id="st-items">0</dd></div>
-    </dl>
+    <div class="stats">
+      <div class="stat"><span>점수</span><b id="st-score">0</b></div>
+      <div class="stat"><span>거리</span><b id="st-dist">0 m</b></div>
+      <div class="stat"><span>최고 콤보</span><b id="st-combo">0</b></div>
+      <div class="stat"><span>수확</span><b id="st-items">0</b></div>
+    </div>
     <p class="best" id="st-best">최고 기록 0</p>
     <img class="pix start blink" id="btn-retry" alt="TAP TO START">
     <p class="help"><b>R</b> 다시 시작</p>

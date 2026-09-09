@@ -40,11 +40,12 @@
     skinIdx: 0,
     flash: 0,
     overReady: false,
+    playing: false,
   };
 
   const best = {
-    get() { try { return +(localStorage.getItem('kimchi.best') || 0); } catch (e) { return 0; } },
-    set(v) { try { localStorage.setItem('kimchi.best', String(v)); } catch (e) {} },
+    get() { try { return +(localStorage.getItem('kingsan.best') || 0); } catch (e) { return 0; } },
+    set(v) { try { localStorage.setItem('kingsan.best', String(v)); } catch (e) {} },
   };
 
   /* ── 화면 배율 ─────────────────────────── */
@@ -64,7 +65,7 @@
     else g.player.setSkin(sk);
     el.skinName.textContent = sk.name;
     el.skinRow.hidden = SKINS.length < 2;
-    try { localStorage.setItem('kimchi.skin', sk.id); } catch (e) {}
+    try { localStorage.setItem('kingsan.skin', sk.id); } catch (e) {}
   }
   function cycleSkin(d) {
     g.skinIdx = (g.skinIdx + d + SKINS.length) % SKINS.length;
@@ -74,6 +75,7 @@
   /* ── 상태 전환 ─────────────────────────── */
   function show(state) {
     g.state = state;
+    g.playing = state === S.PLAYING;
     el.loading.hidden = state !== S.LOADING;
     el.title.hidden   = state !== S.TITLE;
     el.pause.hidden   = state !== S.PAUSED;
@@ -222,10 +224,10 @@
     const sh = g.fx.shake;
     if (sh > 0.4) ctx.translate((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh);
 
-    g.bg.draw(ctx);
+    g.bg.draw(ctx, g.state === S.PLAYING || g.state === S.PAUSED ? 0.22 : 0.10);
 
     if (g.state === S.TITLE) {
-      g.player.drawIdle(ctx, g.titleT);
+      g.player.drawIdle(ctx, g.titleT, TITLE_X);
       ctx.restore();
       return;
     }
@@ -233,7 +235,7 @@
     /* 아이템은 장애물 뒤 */
     for (const it of g.pickups) it.draw(ctx);
     for (const o of g.obstacles) if (!(o instanceof Awning)) o.draw(ctx);
-    g.player.draw(ctx);
+    g.player.draw(ctx, { noBlink: g.state !== S.PLAYING });
     for (const o of g.obstacles) if (o instanceof Awning) o.draw(ctx);
     g.fx.draw(ctx);
 
@@ -254,6 +256,13 @@
     Hud.draw(ctx, g);
   }
 
+  /** 상태에 맞는 1프레임 갱신 */
+  function tick() {
+    if (g.state === S.PLAYING) step();
+    else if (g.state === S.TITLE) { g.titleT++; g.bg.update(SPEED_BASE * 0.5); }
+    else if (g.state === S.OVER) { g.fx.update(); if (g.flash > 0) g.flash--; }
+  }
+
   /* ── 루프 ──────────────────────────────── */
   let acc = 0, last = 0;
   function frame(now) {
@@ -264,12 +273,7 @@
     acc += dt;
 
     let guard = 6;
-    while (acc >= STEP && guard-- > 0) {
-      acc -= STEP;
-      if (g.state === S.PLAYING) step();
-      else if (g.state === S.TITLE) { g.titleT++; g.bg.update(SPEED_BASE * 0.5); }
-      else if (g.state === S.OVER) g.fx.update();
-    }
+    while (acc >= STEP && guard-- > 0) { acc -= STEP; tick(); }
     if (acc > STEP * 6) acc = 0;
 
     if (g.state !== S.LOADING) render();
@@ -278,11 +282,11 @@
   /* ── 디버그 훅 ─────────────────────────
      탭이 백그라운드면 requestAnimationFrame 이 멈추므로
      콘솔에서 프레임을 직접 돌려볼 수 있게 열어 둔다. */
-  window.KimchiRun = {
+  window.KingsanRun = {
     get g() { return g; },
     S,
     advance(n) {
-      for (let i = 0; i < (n || 1); i++) if (g.state === S.PLAYING) step();
+      for (let i = 0; i < (n || 1); i++) tick();
       render();
       return { frame: g.frame, dist: Math.round(g.dist), score: Math.floor(g.score),
                hp: g.player.hp, combo: g.combo, state: g.state };
@@ -297,12 +301,14 @@
   resize();
   Assets.loadAll(p => { el.loadFill.style.width = Math.round(p * 100) + '%'; })
     .then(() => {
-      el.logo.src = 'assets/title.png';
-      el.start.src = 'assets/start_button.png';
-      el.retry.src = 'assets/start_button.png';
+      el.logo.src = Assets.get('title').src;
+      el.start.src = el.retry.src = Assets.get('start_button').src;
+      const root = document.documentElement.style;
+      root.setProperty('--logo-w', String(Assets.get('title').naturalWidth));
+      root.setProperty('--btn-w', String(Assets.get('start_button').naturalWidth));
 
       let saved = null;
-      try { saved = localStorage.getItem('kimchi.skin'); } catch (e) {}
+      try { saved = localStorage.getItem('kingsan.skin'); } catch (e) {}
       const i = SKINS.findIndex(s => s.id === saved);
       g.skinIdx = i >= 0 ? i : 0;
       applySkin();

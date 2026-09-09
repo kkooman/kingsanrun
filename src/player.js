@@ -191,15 +191,16 @@ class Player {
   }
 
   /** 타이틀 화면용 제자리 달리기 */
-  drawIdle(ctx, t) {
+  drawIdle(ctx, t, x) {
     const S = SKIN_SPEC;
+    const cx = x == null ? PLAYER_X : x;
     const f = ((t * 0.22 * RUN_ANIM_RATE) | 0) % S.runFrames;
     const sx = (f % S.runCols) * S.runFW;
     const sy = ((f / S.runCols) | 0) * S.runFH;
     ctx.globalAlpha = 0.3; ctx.fillStyle = C.ink;
-    ctx.beginPath(); ctx.ellipse(PLAYER_X, FEET_Y + 1, 10, 2.2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx, FEET_Y + 1, 10, 2.2, 0, 0, Math.PI * 2); ctx.fill();
     ctx.globalAlpha = 1;
     ctx.drawImage(this.runIm, sx, sy, S.runFW, S.runFH,
-      Math.round(PLAYER_X - S.runFW / 2), Math.round(FEET_Y - this.skin.runFeet), S.runFW, S.runFH);
+      Math.round(cx - S.runFW / 2), Math.round(FEET_Y - this.skin.runFeet), S.runFW, S.runFH);
   }
 }

@@ -24,7 +24,9 @@ class Background {
   }
 
   _push(x) {
-    const name = SHOP_SPRITES[(Math.random() * SHOP_SPRITES.length) | 0];
+    const prev = this.shops.length ? this.shops[this.shops.length - 1].name : null;
+    let name = prev;
+    while (name === prev) name = SHOP_SPRITES[(Math.random() * SHOP_SPRITES.length) | 0];
     const im = Assets.get(name);
     this.shops.push({ name, x, w: im.width, h: im.height });
     return x + im.width + 2 + ((Math.random() * 16) | 0);
@@ -44,7 +46,8 @@ class Background {
     if (!last || last.x + last.w < VIEW_W + 120) this._push(last ? last.x + last.w + 2 + ((Math.random() * 16) | 0) : VIEW_W);
   }
 
-  draw(ctx) {
+  /** @param {number} scrim 배경을 눌러주는 정도 (0 = 그대로) */
+  draw(ctx, scrim) {
     /* 하늘 */
     this._tile(ctx, Assets.get('sky'), this.off.sky, 0);
 
@@ -56,6 +59,14 @@ class Background {
     for (const s of this.shops) {
       const im = Assets.get(s.name);
       ctx.drawImage(im, Math.round(s.x), GROUND_TOP + 1 - s.h);
+    }
+
+    /* 원경을 살짝 눌러 캐릭터/아이템의 대비를 확보한다 */
+    if (scrim) {
+      ctx.globalAlpha = scrim;
+      ctx.fillStyle = C.ink;
+      ctx.fillRect(0, 0, VIEW_W, GROUND_TOP);
+      ctx.globalAlpha = 1;
     }
 
     /* 바닥 */

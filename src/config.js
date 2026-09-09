@@ -1,8 +1,12 @@
 /* ============================================================
-   KIMCHI-RUN — 설정 / 튜닝값
+   KINGSAN-RUN — 설정 / 튜닝값
    원본 해상도 320x180 (에셋 기준). 물리는 60fps 고정 스텝.
    ============================================================ */
 'use strict';
+
+/* 에셋을 고치고 새로고침해도 브라우저 캐시에 걸리지 않게 올려 주는 값.
+   file:// 로 열 때는 쿼리를 붙이지 않는다. */
+const ASSET_VERSION = 2;
 
 const VIEW_W = 320;
 const VIEW_H = 180;
@@ -84,13 +88,22 @@ const SKIN_SPEC = {
 
 const SKINS = [
   {
+    id: 'kingsan',
+    name: '킹산이',
+    run: 'kid_run',
+    jump: 'kid_jump',
+    runFeet: 31,                                // run 셀 안에서 발바닥 y
+    jumpFeet: [62, 44, 53, 63, 63, 63],         // jump 프레임별 발바닥 y
+    slideFrame: 4,                              // 슬라이드에 쓸 jump 프레임
+  },
+  {
     id: 'kimchi',
     name: '김치맨',
     run: 'player_run',
     jump: 'player_jump',
-    runFeet: 31,                                // run 셀 안에서 발바닥 y
-    jumpFeet: [62, 44, 53, 63, 63, 63],         // jump 프레임별 발바닥 y
-    slideFrame: 4,                              // 슬라이드에 쓸 jump 프레임
+    runFeet: 31,
+    jumpFeet: [62, 44, 53, 63, 63, 63],
+    slideFrame: 4,
   },
   // 예) 새 사람으로 교체하려면 시트를 넣고 아래 주석을 풀 것
   // {
@@ -101,12 +114,15 @@ const SKINS = [
 ];
 
 /* assets/ 에 있으면 자동으로 스킨 목록에 붙는 슬롯.
-   player2_run.png + player2_jump.png 를 넣기만 하면 타이틀에서 고를 수 있다. */
+   player2_run.png + player2_jump.png 를 넣기만 하면 타이틀에서 고를 수 있다.
+   파일이 없는 슬롯은 콘솔에 404 가 한 번 찍히는데 정상이다. */
 const SKIN_SLOTS = [
   { id: 'player2', name: '캐릭터 2' },
   { id: 'player3', name: '캐릭터 3' },
-  { id: 'player4', name: '캐릭터 4' },
 ];
+
+/* 타이틀 화면에서 캐릭터가 제자리 달리기 하는 x (UI 와 겹치지 않는 자리) */
+const TITLE_X = 254;
 
 /* ── 배경 레이어 ──────────────────────────── */
 const PARALLAX = { sky: 0.06, city: 0.16, shops: 0.42, ground: 1.0 };

@@ -6,7 +6,7 @@
 
 const Sfx = (() => {
   let ac = null, master = null, musicGain = null;
-  let musicOn = load('kimchi.music', '1') === '1';
+  let musicOn = load('kingsan.music', '1') === '1';
   let musicTimer = null, step = 0;
 
   function load(k, d) { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } }
@@ -94,7 +94,7 @@ const Sfx = (() => {
 
   function toggleMusic() {
     musicOn = !musicOn;
-    save('kimchi.music', musicOn ? '1' : '0');
+    save('kingsan.music', musicOn ? '1' : '0');
     if (musicGain) musicGain.gain.value = musicOn ? 0.13 : 0;
     return musicOn;
   }

@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "kimchi-run",
+      "name": "kingsan-run",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "5177"],
       "port": 5177

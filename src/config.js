@@ -6,7 +6,7 @@
 
 /* 에셋을 고치고 새로고침해도 브라우저 캐시에 걸리지 않게 올려 주는 값.
    file:// 로 열 때는 쿼리를 붙이지 않는다. */
-const ASSET_VERSION = 2;
+const ASSET_VERSION = 3;
 
 const VIEW_W = 320;
 const VIEW_H = 180;

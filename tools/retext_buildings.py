@@ -66,7 +66,37 @@ def layout(cells_span, n, glyph_w, advance=None):
     return [start + i * advance for i in range(n)]
 
 
-def draw_text(px, text, cells, top, colors, borders, table=None, clip=None):
+def _fill_holes(core, grown, color, px, clip):
+    """테두리로 완전히 둘러싸인 배경 구멍을 색으로 메운다.
+       (ㅇ 같은 닫힌 글자 안쪽에 배경이 비쳐 보이는 것을 막는다)"""
+    if not grown:
+        return
+    xs = [p[0] for p in grown]; ys = [p[1] for p in grown]
+    x0, x1 = min(xs) - 1, max(xs) + 1
+    y0, y1 = min(ys) - 1, max(ys) + 1
+    outside = set()
+    stack = [(x0, y0)]
+    while stack:
+        p = stack.pop()
+        if p in outside or p in grown or p in core:
+            continue
+        if not (x0 <= p[0] <= x1 and y0 <= p[1] <= y1):
+            continue
+        outside.add(p)
+        stack.extend([(p[0] + 1, p[1]), (p[0] - 1, p[1]),
+                      (p[0], p[1] + 1), (p[0], p[1] - 1)])
+    cx0, cy0, cx1, cy1 = clip
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            p = (x, y)
+            if p in outside or p in grown or p in core:
+                continue
+            if cx0 <= x <= cx1 and cy0 <= y <= cy1:
+                px[y][x] = color
+
+
+def draw_text(px, text, cells, top, colors, borders, table=None, clip=None,
+              fill_holes=False):
     """글자를 찍고, borders 에 준 색으로 한 겹씩 바깥으로 테두리를 두른다.
 
        colors  : 글자마다의 채움색 리스트(길이 = len(text))
@@ -97,6 +127,9 @@ def draw_text(px, text, cells, top, colors, borders, table=None, clip=None):
                     ring.add(p)
         layers.append((color, ring))
         grown |= ring
+    if fill_holes and layers:
+        _fill_holes(core, grown, layers[-1][0], px, clip)
+
     for color, ring in reversed(layers):
         for p in ring:
             if inside(p):
@@ -135,7 +168,8 @@ def job_01():
     px = [row[:] for row in src]
     fill_rect(px, 21, 0, 85, 10, TRANS)
     text = '도깨비시장'
-    cells = layout((24, 82), len(text), 9)
+    # 테두리가 3겹(흰+남색+검정)이라 자간 1px 로는 글자끼리 붙는다
+    cells = layout((24, 82), len(text), 9, advance=12)
     draw_text(px, text, cells, 2, [WHITE] * len(text),
               [(NAVY, NEI4), (INK, NEI4)], clip=(6, 0, 99, 10))
     write_png(os.path.join(A, name), px)
@@ -194,7 +228,7 @@ def job_04():
     cells = layout((13, 75), len(text), gw, advance=gw + 6)
     colors = [B_BLUE, B_BLUE, B_GREEN, B_GREEN, B_RED]
     draw_text(px, text, cells, 12, colors,
-              [(OUTWHT, NEI8)], table=G6, clip=(6, 10, 79, 19))
+              [(OUTWHT, NEI8)], table=G6, clip=(6, 10, 79, 19), fill_holes=True)
     write_png(os.path.join(A, name), px)
     return name, text, cells
 
